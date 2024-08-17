@@ -20,7 +20,6 @@ function List() {
             current = current.next;
             index++;
         }
-
         setList(arr);
     };
 
