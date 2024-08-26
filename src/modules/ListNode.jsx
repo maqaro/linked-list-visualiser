@@ -1,4 +1,3 @@
-// ListNode.jsx
 import React from 'react';
 
 function ListNode({ value, index, next, animationClass }) {

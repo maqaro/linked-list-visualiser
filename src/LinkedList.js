@@ -2,6 +2,7 @@ class ListNode {
     constructor(data) {
         this.data = data;
         this.next = null;
+        this.id = Math.random().toString(36).substring(2, 9);
     }
 }
 

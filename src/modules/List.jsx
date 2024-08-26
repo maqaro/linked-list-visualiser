@@ -6,11 +6,13 @@ import ControlBar from './ControlBar.jsx';
 const linkedList = new LinkedList();
 linkedList.push(1);
 linkedList.push(2);
+linkedList.push(3);
 
 function List() {
     const [list, setList] = useState([]);
     const [newNode, setNewNode] = useState('');
-    const [animationClass, setAnimationClass] = useState('');
+    const [animatingNodeId, setAnimatingNodeId] = useState(null);
+    const [action, setAction] = useState(null); 
 
     const convertListToArray = () => {
         const arr = [];
@@ -31,30 +33,36 @@ function List() {
     const handleAdd = () => {
         if (newNode) {
             linkedList.push(parseInt(newNode, 10));
-            setNewNode('');
-            setAnimationClass('adding');
+            const lastNode = linkedList.getLast();
+            setAnimatingNodeId(lastNode.id);
+            setAction('adding');
             setTimeout(() => {
                 convertListToArray();
-                setAnimationClass('');
-            }, 500);
+                setAnimatingNodeId(null); 
+            }, 500); 
+            setNewNode('');
         }
     };
 
     const handleRemove = () => {
-        setAnimationClass('removing');
-        setTimeout(() => {
-            linkedList.pop();
-            convertListToArray();
-            setAnimationClass('');
-        }, 500); 
+        if (linkedList.size > 0) {
+            const lastNode = linkedList.getLast();
+            setAnimatingNodeId(lastNode.id);
+            setAction('removing');
+            setTimeout(() => {
+                linkedList.pop();
+                convertListToArray();
+                setAnimatingNodeId(null);
+            }, 500);
+        }
     };
 
     const handleReverse = () => {
-        setAnimationClass('reversing');
+        setAction('reversing');
         setTimeout(() => {
             linkedList.reverse();
             convertListToArray();
-            setAnimationClass('');
+            setAction(null);
         }, 500);  
     };
 
@@ -65,9 +73,10 @@ function List() {
                     {list.map(({ node, index }) => {
                         const nextNode = node.next ? list.find(item => item.node === node.next) : null;
                         const nextIndex = nextNode ? nextNode.index : null;
+                        const animationClass = action === 'reversing' ? 'reversing' : (node.id === animatingNodeId ? action : '');
                         return (
                             <ListNode
-                                key={index}
+                                key={node.id}
                                 value={node.data}
                                 index={index}
                                 next={nextIndex}
