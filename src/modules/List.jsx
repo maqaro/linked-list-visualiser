@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ListNode from './ListNode.jsx';
 import LinkedList from '../LinkedList.js';
+import ControlBar from './ControlBar.jsx';
 
 const linkedList = new LinkedList();
 linkedList.push(1);
@@ -9,7 +10,7 @@ linkedList.push(2);
 function List() {
     const [list, setList] = useState([]);
     const [newNode, setNewNode] = useState('');
-    const [length, setLength] = useState(3);
+    const [animationClass, setAnimationClass] = useState('');
 
     const convertListToArray = () => {
         const arr = [];
@@ -31,49 +32,58 @@ function List() {
         if (newNode) {
             linkedList.push(parseInt(newNode, 10));
             setNewNode('');
-            convertListToArray();
+            setAnimationClass('adding');
+            setTimeout(() => {
+                convertListToArray();
+                setAnimationClass('');
+            }, 500);
         }
     };
 
     const handleRemove = () => {
-        linkedList.pop();
-        convertListToArray();
+        setAnimationClass('removing');
+        setTimeout(() => {
+            linkedList.pop();
+            convertListToArray();
+            setAnimationClass('');
+        }, 500); 
     };
 
     const handleReverse = () => {
-        linkedList.reverse();
-        convertListToArray();
+        setAnimationClass('reversing');
+        setTimeout(() => {
+            linkedList.reverse();
+            convertListToArray();
+            setAnimationClass('');
+        }, 500);  
     };
 
     return (
         <div className='listWrapper'>
             <div className='listArea'>
                 <div className='linkedList'>
-                    {list.map(({ node, index }) => (
-                        <ListNode
-                            key={index}
-                            value={node.data}
-                            index={index}
-                            next={node.next ? list.find(item => item.node === node.next).index : null}
-                        />
-                    ))}
+                    {list.map(({ node, index }) => {
+                        const nextNode = node.next ? list.find(item => item.node === node.next) : null;
+                        const nextIndex = nextNode ? nextNode.index : null;
+                        return (
+                            <ListNode
+                                key={index}
+                                value={node.data}
+                                index={index}
+                                next={nextIndex}
+                                animationClass={animationClass}
+                            />
+                        );
+                    })}
                 </div>
             </div>
-            <div className='controlBox'>
-                <div className='inputSection'>
-                    <input
-                        className='valueBox'
-                        placeholder='Enter node value'
-                        value={newNode}
-                        onChange={(e) => setNewNode(e.target.value)}
-                    />
-                    <button className='addButton' onClick={handleAdd}>Add Node</button>
-                </div>
-                <div className='buttonSection'>
-                    <button className='removeButton' onClick={handleRemove}>Remove Node</button>
-                    <button className='reverseButton' onClick={handleReverse}>Reverse List</button>
-                </div>
-            </div>
+            <ControlBar
+                newNode={newNode}
+                setNewNode={setNewNode}
+                handleAdd={handleAdd}
+                handleRemove={handleRemove}
+                handleReverse={handleReverse}
+            />
         </div>
     );
 }
